@@ -1,0 +1,4 @@
+include README.md
+recursive-include SIOConfigurator/templates *
+recursive-include SIOConfigurator/translations *
+recursive-include SIOConfigurator/static *

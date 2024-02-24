@@ -1,0 +1,59 @@
+<div class="row-fluid span12">
+    <div class="tabbable">
+		<h3>SIO Reaction Settings</h3>
+        <ul class="nav nav-tabs" id="siocontrol_tabs">
+			<li class="active"><a data-toggle="tab" href="#SIOAssignments">IO Assignments</a></li>
+            <li><a data-toggle="tab" href="#sioa_Help">Help</a></li>
+		</ul>
+		<div class="tab-content">
+            <div id="sioa_Help" class="tab-pane">
+                <div class="row-fluid">
+                    Top text
+                </div>
+                <div class="row-fluid">
+                    <h4>Heading</h4>
+                </div>  
+                <div class="row-fluid">
+                content text 1
+                </div>
+                <div class="row-fluid">
+                content text 2
+                </div>
+            </div>
+
+            <div id="SIOAssignments" class="tab-pane active" >
+                <div class="span12 ">
+                    <div class="row-fluid">
+                        Select the IO type you want for each IO point on your device.  Then press save to apply the new settings to your device.
+
+
+                    </div>
+                    <div class="row-fluid">
+                        <p>You must reference your micoro cotrollers capabilities and ensure that you only set IO points to types that they can support.</p>
+
+                        <p>For example the ESP32 micro controller has some IO points that can not be used as outputs and others that can not be used for PWM. An IO point that cant be used as both and input and and output can not support DHT (1 wire) communications.</p>
+                        See the help Tab for details specific to the IO board and firmware this plugin was designed to work with. 
+                    </div>
+                </div>
+                <div class="span12 ">
+                    <div class="span2"><h4>SIO IO Number</h4></div>
+                    <div class="span6"><h4>SIO IO Type</h4></div>
+                </div>
+                <div data-bind="foreach: vmsioassignments">
+                    <div class="row-fluid siocontrol-settings-row">
+                        <div class="input-prepend span2">
+                            <input class="siocontrol_textName" disabled=disabled type="text" data-bind="value: index"/>
+                        </div>
+                        <div class="input-prepend span6">
+                            <select class="btn-group span12" data-bind="options: $parent.vmsiotypeconstants,
+                                                                        optionsText: 'typestring',
+                                                                        optionsValue: 'typeid',
+                                                                        value: iotype">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
