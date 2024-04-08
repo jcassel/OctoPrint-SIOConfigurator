@@ -1,6 +1,6 @@
 <div class="row-fluid span12">
     <div class="tabbable">
-		<h3>SIO Reaction Settings</h3>
+		<h3>SIO Configurator Settings</h3>
         <ul class="nav nav-tabs" id="siocontrol_tabs">
 			<li class="active"><a data-toggle="tab" href="#SIOAssignments">IO Assignments</a></li>
             <li><a data-toggle="tab" href="#sioa_Help">Help</a></li>
@@ -35,6 +35,10 @@
                         See the help Tab for details specific to the IO board and firmware this plugin was designed to work with. 
                     </div>
                 </div>
+                <div>
+                    <button class="btn btn-primary" data-bind="click: RefreshIOAssignments" title="Refresh IO Assignments">Refresh IO Assignments</button>
+                </div>
+
                 <div class="span12 ">
                     <div class="span2"><h4>SIO IO Number</h4></div>
                     <div class="span6"><h4>SIO IO Type</h4></div>
@@ -48,7 +52,7 @@
                             <select class="btn-group span12" data-bind="options: $parent.vmsiotypeconstants,
                                                                         optionsText: 'typestring',
                                                                         optionsValue: 'typeid',
-                                                                        value: iotype">
+                                                                        value: iotype, event:{ change: $parent.AssignmentChanged}">
                             </select>
                         </div>
                     </div>

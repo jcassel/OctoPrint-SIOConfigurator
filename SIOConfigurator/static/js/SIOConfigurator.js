@@ -17,26 +17,39 @@ $(function() {
             self.settings = self.settingsViewModel.settings;
             self.vmsioassignments(self.settingsViewModel.settings.plugins.SIOConfigurator.sioassignments.slice(0));
             self.vmsiotypeconstants(self.settingsViewModel.settings.plugins.SIOConfigurator.siotypeconstants.slice(0));
-            //self.vmsioconfiguration(self.settings.plugins.siocontrol.sio_configurations.slice(0)); //this is for/from SIO Parent plugin.
+            
         };
 
         self.onSettingsBeforeSave = function () {
             self.settingsViewModel.settings.plugins.SIOConfigurator.sioassignments(self.vmsioassignments.slice(0));
-            //self.settingsViewModel.settings.plugins.SIOConfigurator.siotypeconstants(self.siotypeconstants.slice(0));
+            
         };
 
         self.onSettingsHidden = function () {
             self.vmsioassignments(self.settingsViewModel.settings.plugins.SIOConfigurator.sioassignments.slice(0));
-            //self.vmsioconfiguration(self.settings.plugins.siocontrol.sio_configurations.slice(0));  //this is for/from SIO Parent plugin.        };
+            
         };
         
         self.onSettingsShown = function () {
-            self.vmsioassignments(self.settingsViewModel.settings.plugins.SIOConfigurator.sioassignments.slice(0));
-            self.vmsiotypeconstants(self.settingsViewModel.settings.plugins.SIOConfigurator.siotypeconstants.slice(0));
-            //self.vmsioconfiguration(self.settings.plugins.siocontrol.sio_configurations.slice(0));  //this is for/from SIO Parent plugin.
+            self.RefreshIOAssignments();
+            //self.vmsioassignments(self.settingsViewModel.settings.plugins.SIOConfigurator.sioassignments.slice(0));
+            //self.vmsiotypeconstants(self.settingsViewModel.settings.plugins.SIOConfigurator.siotypeconstants.slice(0));
+
+            
         };
         
-        
+        self.RefreshIOAssignments = function () {
+            OctoPrint.simpleApiCommand("SIOConfigurator", "getIOConfig", {}).then(function (templateVars) {
+                self.vmsioassignments(templateVars.SIOAssignments);
+                self.vmsiotypeconstants(templateVars.SIOTypeConstants);
+            });
+        };
+
+        self.AssignmentChanged = function (obj, event) {
+            if(!event.origenalEvent){
+                OctoPrint.simpleApiCommand("SIOConfigurator", "AssignmentChanged", {}).then(function (isOK) {});
+            }
+        };
 
         self.getIOTypeNames - function(){
             return self.vmsiotypes;
