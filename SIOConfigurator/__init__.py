@@ -27,7 +27,7 @@ class SIOConfigurator(
         self.RequireTC = True  # have to get a reading of the types to be ready for reconfig and before we get current IT assignments
         self.RequireIT = True  # have to get a reading to be ready for reconfig.
         self.RequireVC = True  # have check to see if this controler will even respond correctly to the TC and IT commands.
-        self.compatability = ["SIO_ESP32WRM_Relay_X2 1.1.4","SIO_ESP12F_Relay_X2 1.0.10","SIO_Arduino_General 1.0.11"]
+        self.compatability = ["SIO_ESP32WRM_Relay_X2 1.1.6", "SIO_ESP12F_Relay_X2 1.0.10", "SIO_Arduino_General 1.0.11"]
         self.compatabible = False
         self.isAssignmentChanged = False
         return
@@ -93,7 +93,7 @@ class SIOConfigurator(
                 self._logger.Exception("New IO Pattern data is not in the expected order, Pattern will not be saved: {}!={}".format(idx, ioa["index"]))
                 return
         
-        self.make_Serial_Request("EIO")# stop auto reporting while we update the IO configuration.
+        self.make_Serial_Request("EIO") # stop auto reporting while we update the IO configuration.
 
         sioSaveCommand = "SIO"
         self.make_Serial_Request(sioPattern)  # make request to change IO Configuration.
@@ -132,7 +132,6 @@ class SIOConfigurator(
                 self.siocontrol_helper["register_plugin"](self)
                 self._logger.info("Regestered as Sub Plugin to SIO Control")
                 
-
         except Exception as err:
             self._logger.exception("Exception: {}, {}".format(err, type(err)))
 
@@ -222,15 +221,14 @@ class SIOConfigurator(
             self._logger.debug("***********************************************************************************************")
             self._logger.debug("SIO Configurator capture Version as: {}".format(line))
             self._logger.debug("***********************************************************************************************")
-            if(line[3:] in self.compatability):
+            if line[3:] in self.compatability:
                 #self.has_SIOC = True
                 self._logger.info("SIO Controller is Compatible with this Plugin.")
                 self.compatabible = True
             else:
-                #self.has_SIOC = False
+                # self.has_SIOC = False
                 self._logger.error("SIO Controller is not Compatible with this Plugin.\n\tPlease update the controller firmware to a compatible version.")
-                self.compatabible = False
-                        
+                self.compatabible = False                        
 
     def sioStateChanged(self, newIOstate, newIOStatus):
         previousIOState = self.IOState
