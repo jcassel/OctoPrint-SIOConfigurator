@@ -28,6 +28,7 @@ class SIOConfigurator(
         self.RequireIT = True  # have to get a reading to be ready for reconfig.
         self.RequireVC = True  # have check to see if this controler will even respond correctly to the TC and IT commands.
         self.compatability = ["SIO_ESP32WRM_Relay_X2 1.1.6", "SIO_ESP12F_Relay_X2 1.0.10", "SIO_Arduino_General 1.0.11"]
+        self.firmwareVersion = ""
         self.compatabible = False
         self.isAssignmentChanged = False
         return
@@ -58,20 +59,21 @@ class SIOConfigurator(
             "SIOTypeConstants": self._settings.get(["siotypeconstants"]),
             "SIOCompatability": self.compatability,
             "SIOCompatible": self.compatabible,
+            "SIOFirmwareVersion": self.firmwareVersion,
         }
 
     def on_settings_initialized(self):
         return super().on_settings_initialized()
 
     def on_settings_save(self, data):
-        if self.compatabible == False:
+        if self.compatabible is False:
             self._logger.error("SIO Controller is not Compatible with this Plugin.\n\tPlease update the controller firmware to a compatible version.")
             return
-        
-        if self.isAssignmentChanged == False:
+
+        if self.isAssignmentChanged is False:
             self._logger.debug("No changes to IO Configuration were made.")
             return
-        
+
         # currently there are no local(to OctoPrint) settings to save. IO config is sent to the controller and saved in the controller.
         sioPattern = "CIO "
         idx = 0
@@ -92,8 +94,8 @@ class SIOConfigurator(
                 self.RequireTC = True
                 self._logger.Exception("New IO Pattern data is not in the expected order, Pattern will not be saved: {}!={}".format(idx, ioa["index"]))
                 return
-        
-        self.make_Serial_Request("EIO") # stop auto reporting while we update the IO configuration.
+
+        self.make_Serial_Request("EIO")  # stop auto reporting while we update the IO configuration.
 
         sioSaveCommand = "SIO"
         self.make_Serial_Request(sioPattern)  # make request to change IO Configuration.
@@ -105,17 +107,17 @@ class SIOConfigurator(
         data["siotypeconstants"] = []
         self.RequireIT = True
         self.RequireTC = True
-        self.isAssignmentChanged == False
+        self.isAssignmentChanged = False
         self._logger.info("Resetting IO Controller")
         resetThread = threading.Thread(target=self.resetIOController)
         resetThread.start()
-        #self.make_Serial_Request("reset")  # reset the IO controller to apply the new configuration.
+        # self.make_Serial_Request("reset")  # reset the IO controller to apply the new configuration.
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
-        #removed do not need because we are resetting the controller now.
-        #self.make_Serial_Request("BIO")# start auto reporting while we update the IO configuration.
+        # removed do not need because we are resetting the controller now.
+        # self.make_Serial_Request("BIO")# start auto reporting while we update the IO configuration.
 
         return super().on_settings_save(data)
-    
+
     def resetIOController(self):
         time.sleep(5)
         self._logger.info("Calling reset to IO Controller to apply new configuration.")
@@ -131,14 +133,13 @@ class SIOConfigurator(
             else:
                 self.siocontrol_helper["register_plugin"](self)
                 self._logger.info("Regestered as Sub Plugin to SIO Control")
-                
+
         except Exception as err:
             self._logger.exception("Exception: {}, {}".format(err, type(err)))
 
     def get_api_commands(self):
         return dict(
-            getIOConfig="",AssignmentChanged=""
-            
+            getIOConfig="", AssignmentChanged=""
         )
 
     def on_api_command(self, command, data):
@@ -167,8 +168,8 @@ class SIOConfigurator(
 
             if self.RequireVC:
                 self.make_Serial_Request("VC")  # get IO Version info
-                self.RequireVC = False #do nothing for now. just set this to true as it is true.
-            else:    
+                self.RequireVC = False  # do nothing for now. just set this to true as it is true.
+            else:
                 if self.RequireTC:
                     self.make_Serial_Request("TC")  # get type list.
                     self.RequireTC = False
@@ -176,7 +177,7 @@ class SIOConfigurator(
                     if self.RequireIT:
                         self.make_Serial_Request("IOT")  # get current IOT assignments
                         self.RequireIT = False
-            
+
         elif line[:2] == "TC":
             self.RequireTC = False
             self._logger.debug("***********************************************************************************************")
@@ -196,7 +197,7 @@ class SIOConfigurator(
             self.RequireTC = len(self.SIO_TypeConstants) == 0
 
         elif line[:2] == "IT":
-            
+
             # this is the current configuation for IO.
             self._logger.debug("***********************************************************************************************")
             self._logger.debug("SIO Configurator capture IO Types as: {}".format(line))
@@ -216,19 +217,20 @@ class SIOConfigurator(
             self._settings.set(["sioassignments"], iosa)
             self.RequireIT = len(self.SIO_Assignments) == 0
 
-        elif line[:2] == "VI": #VC is the command that is sent for this response
+        elif line[:2] == "VI":  # VC is the command that is sent for this response
             self.RequireVC = False
             self._logger.debug("***********************************************************************************************")
             self._logger.debug("SIO Configurator capture Version as: {}".format(line))
             self._logger.debug("***********************************************************************************************")
             if line[3:] in self.compatability:
-                #self.has_SIOC = True
+                self.firmwareVersion = line[3:]
+                # self.has_SIOC = True
                 self._logger.info("SIO Controller is Compatible with this Plugin.")
                 self.compatabible = True
             else:
                 # self.has_SIOC = False
                 self._logger.error("SIO Controller is not Compatible with this Plugin.\n\tPlease update the controller firmware to a compatible version.")
-                self.compatabible = False                        
+                self.compatabible = False
 
     def sioStateChanged(self, newIOstate, newIOStatus):
         previousIOState = self.IOState
