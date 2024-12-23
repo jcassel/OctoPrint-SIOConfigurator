@@ -7,36 +7,100 @@
 		</ul>
 		<div class="tab-content">
             <div id="sioa_Help" class="tab-pane">
-                <div class="row-fluid">
-                    Top text
+                <div class="span12 " >
+                    <h4>Configurator Help</h4>
                 </div>
-                <div class="row-fluid">
-                    <h4>Heading</h4>
-                </div>  
-                <div class="row-fluid">
-                content text 1
-                </div>
-                <div class="row-fluid">
-                content text 2
+                <div id="helpAccordion" class="accordion">
+                    <div class="accordion-group" >
+                        <div class="accordion-heading">
+                            <h5 class="mb-0">
+                                <button class="accordion-toggle" data-parent="helpAccordion" data-toggle="collapse" href="#RefreshIOAssignments">Refresh IO Assignments button</button>
+                            </h5>
+                        </div>
+                        <div id="RefreshIOAssignments" class="accordion-body collapse in">
+                            <div class="accordion-inner">
+                                The [Refresh IO Assignments] button is useful when you have plugged in your controller after you have opened your OctoPrint UI interface. There are times when you may need to force an update of information from your controller.  Pushing it will cause OctoPrint to request the IO assignments it has from the last reporting interval to the UI. If you check the “Force Re-Pull IO Assignments” check box and then push the button, OctoPrint will ask the controller for a fresh set of information about its configuration and bring that info to the UI.
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-heading">
+                            <h5 class="mb-0">
+                                <button class="accordion-toggle" data-parent="helpAccordion" data-toggle="collapse" href="#SettingsTable">Editing IO Assignments</button>
+                            </h5>
+                        </div>
+                        <div id="SettingsTable" class="accordion-body collapse in">
+                            <div class="accordion-inner">
+                                <p>There are 2 columns the one on the left will list out each of the IO points that your controller has in its configuration. The one on the right is a list of the existing configuration for your controller. </p>
+                                <p>There are currently 2 Compatibility levels for firmware with the Plugins.  0.1.1 and 0.1.2.</p>
+                                <p>
+                                [0.1.1] is only capable of simple digital IO types. Inputs and outputs.  
+                                </p><p>
+                                [0.1.2] has some additional IO types available such as DHT Output and PWM output. 
+                                </p>
+                                <p>
+                                The PlugIn can tell which your controller’s firmware is capable of and will only show a list of settings to select bases on the controllers compatibility level. 
+                                To update your controller, make new selections for the IO points you wish to change the IO type of. Then click the [Save IO Assignments] button at the bottom of the list.  The text next to the button will show the progress of the update. Most of the time this is very smooth and uneventful. But sometimes you may need to restart your controller. It really depends on the controller you have chosen to use. ESP32s work well and almost never have any issues. Arduino Nanno boards tend to need to be reset after an update. If everything goes as planned, you should see some fairly quick transition of the message from “Normal: IO is actively reporting” to “Resetting IO Controller…. ”  and back again to “Normal: IO is actively reporting”. On some systems this will happen very fast.  
+                                </p><p>
+                                If you are unsure if your change has taken effect, use the [Reset Controller] button and then force a refresh of the IO assignments (See above). This process can be useful to confirm that your update was successful. 
+                                </p>
+                            </div>
+                        </div>
+                        <div class="accordion-heading">
+                            <h5 class="mb-0">
+                                <button class="accordion-toggle" data-parent="helpAccordion" data-toggle="collapse" href="#SelectTypes">Selectable Types of IO</button>
+                            </h5>
+                        </div>
+                        <div id="SelectTypes" class="accordion-body collapse in">
+                            <div class="accordion-inner">
+                                <p>
+                                Every controller might have slight differences in what is supported so know your controller and set you IO accordingly. 
+                                </p><p>
+                                <h5>INPUT:</h5>Configures the IO point to be a floating input. It might float high or low so it is important to attach it to one or the other and have the sensor transition. 
+                                </p><p>
+                                <h5>INPUT_PULLUP:</h5>Configures the IO point to be pulled up to VCC most of the time this is 3.3v or 5v depending on the controller. This is a good setting to use and is the default for IO that supports this type of setting. What it means is that to trigger the IO point as active, you would connect it to ground. 
+                                </p><p>
+                                <h5>INPUT_PULLDOWN:</h5>Configures the IO point to be pulled down to ground (gnd). What it means is that to trigger the IO point as active, you would connect it to your controllers VCC. Most of the time this is 3.3v or 5v. Note that connecting 5v to IO on a controller that works at 3.3v can damage the IO point or the MCU. Know which voltage is ok and always use a resister to limit the current. 10k is a good place to start. 
+                                </p><p>
+                                <h5>OUTPUT:</h5>Configures the IO point as an output. When active it will be +VCC HIGH. 
+                                </p><p>
+                                <h5>OUTPUT_OPEN_DRAIN:</h5>Configures the IO point as an output. When active the IO point is connected to ground(gnd). 
+                                </p><p>
+                                <h5>OUTPUT_PWM:</h5>Configures the IO point as a PWM Source. This is a good choice of output type for motor or light control. This is an advanced output type and although the SIO controller firmware supports this setting, at the time of this writing, there is no plugin support for setting the PWM Values. (Update coming soon).
+                                </p><p>
+                                <h5>INPUT_DHT:</h5>Configures the IO point to work with a DHT sensor. This is an advanced use case, details on how wire the sensor can be found on github in the Firmware wiki(link). 
+                                </p>
+                            </div>
+                        </div>
+                        
+                    </div>
                 </div>
             </div>
 
             <div id="SIOAssignments" class="tab-pane active" >
                 <div class="span12 ">
                     <div class="row-fluid">
-                        Select the IO type you want for each IO point on your device.  Then press save to apply the new settings to your device.
-
-
+                        Select the IO type you want for each IO point on your device. To apply your changes, click the [Save IO Assignments] button.
                     </div>
                     <div class="row-fluid">
                         <p>You must reference your micoro cotrollers capabilities and ensure that you only set IO points to types that they can support.</p>
-
-                        <p>For example the ESP32 micro controller has some IO points that can not be used as outputs and others that can not be used for PWM. An IO point that cant be used as both and input and and output can not support DHT (1 wire) communications.</p>
-                        See the help Tab for details specific to the IO board and firmware this plugin was designed to work with. 
                     </div>
+                    <div class="row-fluid">
+                        <p>Your firmware is listing this version: <span data-bind="text: SIOFirmwareVersion"></span></p>
+                        <p>Your firmware is listing this compatibilty: <span data-bind="text: SIOReportedCompatibleVersion"></span></p>
+                        <p>Note that if you are using a ESP32 based board, IO 0-3 are Input only. They do not support Pull up/down or OutPut configurations </p>
+                    </div>    
+                    <div>
+                        <p><h4>Caution</h4> making changes here will update your controller’s internal settings. Depending on how you have it wired, you could damage the IO point internal to the MCU or other connected devices. Be sure you understand the change you are making before you make it. </p>
+                    </div>
+
                 </div>
-                <div>
-                    <button class="btn btn-primary" data-bind="click: RefreshIOAssignments" title="Refresh IO Assignments">Refresh IO Assignments</button>
+                <div class="span 12">
+                    <div class="row-fluid">
+                        <p>
+                            <button class="btn btn-primary" data-bind="click: RefreshIOAssignments" title="Refresh IO Assignments">Refresh IO Assignments</button>
+                            <label class="checkbox inline"><input type="checkbox" class="btn" data-bind="checked: ForceRePullIOAssignments"> Force Re-Pull IO Assignments</label>
+                        </p>
+                    </div>
                 </div>
 
                 <div class="span12 ">
@@ -57,7 +121,27 @@
                         </div>
                     </div>
                 </div>
+                <div class="row-fluid siocontrol-settings-row">
+                    <div class="span4">
+                    <button class="btn btn-primary" data-bind="click: SaveIOAssignments" title="Save IO Assignments">Save IO Assignments</button>
+                    </div>
+                    <div class="span8">
+                    [<span data-bind="text: derivedStatus"></span>]
+                    </div>
+                </div>
+                <div class="row-fluid siocontrol-settings-row">
+                    <div class="span12">
+                    <button class="btn btn-primary" data-bind="click: ResetSIOController" title="Reset Controller">Reset Controller</button>
+                    </div>
+                </div>
+                             
+                
+                    
+                
+                
             </div>
+
         </div>
     </div>
 </div>
+
